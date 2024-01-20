@@ -1,4 +1,7 @@
 import app from './app.js';
+import connection from './db.js';
 
-app.listen(3200)
-console.log('i am connect in Server Port', 3200);
+connection();
+
+app.listen(3110)
+console.log('i am connect in Server Port', 3110);
