@@ -38,6 +38,45 @@ export const register=async(req,res)=>{
 
 }
 
-export const login=(req,res)=>{
-    res.send('login');
+export const login=async(req,res)=>{
+    const {email,password} =req.body;
+   try{
+    const userFound = await user.findOne({email});
+    if(!userFound){
+        return res.status(400).json({message:"user was not userFound, try again"});
+    }
+    const isMatching =await bcrypt.compare(password,userFound.password);
+
+    if(!isMatching){
+        return res.status(400).json({message:"Incorrect Password"});
+    }
+ ///creation of the token
+ const token =await createAccessToken({id:userFound._id});
+
+ res.cookie('token',token);
+  res.status(200).json(
+    {status:"success",
+    message:"user found successFully",
+    id:userFound.id,
+    username:userFound.username,
+    email:userFound.email,
+    createdAt:userFound.createdAt,
+    updatedAt:userFound.updatedAt,
+    });
+
+}catch(error){
+    res.status(500).json({
+        status:"error",
+        message:error.message,
+    });
 }
+
+}
+
+export const logout = (req,res)=>{
+    res.cookie('token',"",{
+        expires:new Date(0)
+    })
+    return res.sendStatus(200);
+}
+
