@@ -79,7 +79,7 @@ useEffect(()=>{
        }catch(error){
         setIsAuthenticated(false);
         setUser(null);
-        setLoadin(false);
+        setLoading(false);
        }
 }  
 checkLogin();

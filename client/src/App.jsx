@@ -7,10 +7,12 @@ import TaskformPage from './pages/TaskFormPage';
 import ProfilePage from './pages/ProfilePage';
 import HomePage from './pages/HomePage';
 import ProtectedRoute from './components/ProtectedRoute';
+import { TaskProvider } from './context/TaskContext';
 
 function App(){
   return (
   <AuthProvider>
+    <TaskProvider>
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<HomePage/>} />
@@ -26,6 +28,7 @@ function App(){
       </Routes>
 
     </BrowserRouter>
+    </TaskProvider>
   </AuthProvider>    
   )
 }
