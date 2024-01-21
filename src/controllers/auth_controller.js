@@ -106,13 +106,13 @@ export const verifyToken = async(req,res)=>{
             message:"Unauthorized",
         });
    }
-   jwt.verify(token,TOKEN_SECRET,async(error,user)=>{
+   jwt.verify(token,TOKEN_SECRET,async(error,myUser)=>{
     if(error){
         res.status(500).json({
             message:"Unauthorized" 
         })
     }
-   const userFoundIII = await user.findById(user.id);   
+   const userFoundIII = await user.findById(myUser.id);   
    if(!userFoundIII){
     return res.status(401).json({
         message:"Unauthorized"
