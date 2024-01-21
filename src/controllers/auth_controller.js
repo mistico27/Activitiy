@@ -2,15 +2,16 @@ import user from '../models/user_model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import createAccessToken from '../libs/jwt.js';
+import { TOKEN_SECRET } from '../config.js';
 
 export const register=async(req,res)=>{
-    const {email,password,username} =req.body;
+    
    try{
-
+    const {email,password,username} =req.body;
     const userFoundII =await user.findOne({email});
     if(userFoundII){
         return res.status(400).json(
-        ['The email already exists']
+        ['The email already exists'],
         )
     }
     const passwordHash =await bcrypt.hash(password,10);
@@ -23,12 +24,11 @@ export const register=async(req,res)=>{
 
  const userSaved= await newUser.save();
  ///creation of the token
- const token =await createAccessToken({id:userSaved._id});
+ const token =await createAccessToken({id:userSaved._id,});
 
- res.cookie('token',token);
+ res.cookie('token');
   res.status(200).json(
-    {status:"success",
-    message:"user saved successFully",
+    {
     id:userSaved.id,
     username:userSaved.username,
     email:userSaved.email,
@@ -37,33 +37,29 @@ export const register=async(req,res)=>{
     });
 
 }catch(error){
-    res.status(500).json({
-        status:"error",
-        message:error.message,
-    });
+    res.status(500).json({message:error.message});
 }
 
 }
 
 export const login=async(req,res)=>{
-    const {email,password} =req.body;
    try{
+    const {email,password} =req.body;
     const userFound = await user.findOne({email});
     if(!userFound){
-        return res.status(400).json(["user was not userFound, try again"]);
+        return res.status(400).json({message:["user was not userFound, try again"],});
     }
     const isMatching =await bcrypt.compare(password,userFound.password);
 
     if(!isMatching){
-        return res.status(400).json(["Incorrect Password"]);
+        return res.status(400).json({message:["Incorrect Password"],});
     }
  ///creation of the token
  const token =await createAccessToken({id:userFound._id});
 
  res.cookie('token',token);
-  res.status(200).json(
-    {status:"success",
-    message:"user found successFully",
+  res.json(
+    {
     id:userFound.id,
     username:userFound.username,
     email:userFound.email,
@@ -72,9 +68,8 @@ export const login=async(req,res)=>{
     });
 
 }catch(error){
-    res.status(500).json({
-        status:"error",
-        message:error.message,
+    res.status(500).json({message:
+       error.message,
     });
 }
 
@@ -90,9 +85,9 @@ export const logout = (req,res)=>{
 export const profile =async (req,res)=>{
     const userFound = await user.findById(req.user.id);
     if(!userFound){
-        return res.status(400).json({
-            message:"user not found"
-        });
+        return res.status(400).json(
+           ["user not found"]
+        );
     }
 
     return res.json({
@@ -102,6 +97,31 @@ export const profile =async (req,res)=>{
         createdAt:userFound.createdAt,
         updatedAt:userFound.updatedAt,
     })
+}
 
-   
+export const verifyToken = async(req,res)=>{
+   const{token}= req.cookies;
+   if(!token){
+        return res.status(401).json({
+            message:"Unauthorized",
+        });
+   }
+   jwt.verify(token,TOKEN_SECRET,async(error,user)=>{
+    if(error){
+        res.status(500).json({
+            message:"Unauthorized" 
+        })
+    }
+   const userFoundIII = await user.findById(user.id);   
+   if(!userFoundIII){
+    return res.status(401).json({
+        message:"Unauthorized"
+    })
+   }
+   return res.json({
+        id:userFoundIII._id,
+        username:userFoundIII.username,
+        email:userFoundIII.email
+      });
+   });
 }

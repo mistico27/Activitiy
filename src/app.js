@@ -6,7 +6,11 @@ import taskRoutes from './routes/tasks_routes.js';
 import cors from 'cors';
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin:'http://localhost:5173', 
+   credentials:true,
+   optionSuccessStatus:200,
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());

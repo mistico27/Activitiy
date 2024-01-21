@@ -13,7 +13,7 @@ function RegisterPage(){
     const navigation = useNavigate();
     
     useEffect(()=>{
-        if(isAuthenticated) navigation('/task')
+        if(isAuthenticated) navigation('/tasks')
     },[isAuthenticated]);
 
     const onSubmit = handleSubmit(async(values)=>{
