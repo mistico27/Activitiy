@@ -3,6 +3,8 @@ import {registerRequest} from '../api/auth.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useEffect } from 'react';
 import {useNavigate} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 function RegisterPage(){
     const{register,handleSubmit,formState:{errors},}=useForm();
@@ -55,6 +57,9 @@ function RegisterPage(){
                 }
             <button type='submit'>Register</button>
             </form>
+            <p className='flex gap-x-2 justify-between'>
+                If you already have an account <Link to="/login" className='text-sky-500'>Please login</Link> 
+               </p> 
         </div>
     )
 }
