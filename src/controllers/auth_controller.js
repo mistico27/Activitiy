@@ -84,7 +84,7 @@ export const profile =async (req,res)=>{
     const userFound = await user.findById(req.user.id);
     if(!userFound){
         return res.status(400).json({
-            message:"user noty found"
+            message:"user not found"
         });
     }
 
