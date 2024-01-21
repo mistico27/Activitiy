@@ -55,7 +55,7 @@ export const login=async(req,res)=>{
     const isMatching =await bcrypt.compare(password,userFound.password);
 
     if(!isMatching){
-        return res.status(400).json({message:"Incorrect Password"});
+        return res.status(400).json(["Incorrect Password"]);
     }
  ///creation of the token
  const token =await createAccessToken({id:userFound._id});
