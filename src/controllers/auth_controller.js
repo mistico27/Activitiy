@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import createAccessToken from '../libs/jwt.js';
 import { TOKEN_SECRET } from '../config.js';
+import verifyEmail from '../middlewares/emailSender.js';
+
 
 export const register=async(req,res)=>{
     
@@ -26,7 +28,13 @@ export const register=async(req,res)=>{
  const userSaved= await newUser.save();
  ///creation of the token
  const token =await createAccessToken({id:userSaved._id,});
-
+/*
+const link  = `http://localhost:3110/api/users/confirm/${token}`;
+await verifyEmail(email,link);
+res.status(200).send({
+    message:"please check your email"
+})
+*/
  res.cookie('token',token,{
     secure:true,
     sameSite:"none",
