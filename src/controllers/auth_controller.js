@@ -14,6 +14,7 @@ export const register=async(req,res)=>{
         ['The email already exists'],
         )
     }
+    ///hashing password
     const passwordHash =await bcrypt.hash(password,10);
 
     const newUser= new user({
@@ -26,7 +27,10 @@ export const register=async(req,res)=>{
  ///creation of the token
  const token =await createAccessToken({id:userSaved._id,});
 
- res.cookie('token');
+ res.cookie('token',token,{
+    secure:true,
+    sameSite:"none",
+ });
   res.status(200).json(
     {
     id:userSaved.id,
@@ -47,17 +51,20 @@ export const login=async(req,res)=>{
     const {email,password} =req.body;
     const userFound = await user.findOne({email});
     if(!userFound){
-        return res.status(400).json({message:["user was not userFound, try again"],});
+        return res.status(400).json(["user was not userFound, try again"],);
     }
     const isMatching =await bcrypt.compare(password,userFound.password);
 
     if(!isMatching){
-        return res.status(400).json({message:["Incorrect Password"],});
+        return res.status(400).json(["Incorrect Password"],);
     }
  ///creation of the token
- const token =await createAccessToken({id:userFound._id});
+ const token =await createAccessToken({id:userFound._id,username:userFound.username});
 
- res.cookie('token',token);
+ res.cookie('token',token,{
+    secure:true,
+    sameSite:"none",
+ });
   res.json(
     {
     id:userFound.id,
@@ -108,16 +115,13 @@ export const verifyToken = async(req,res)=>{
    }
    jwt.verify(token,TOKEN_SECRET,async(error,myUser)=>{
     if(error){
-        res.status(500).json({
-            message:"Unauthorized" 
-        })
+        res.status(401);
     }
    const userFoundIII = await user.findById(myUser.id);   
    if(!userFoundIII){
-    return res.status(401).json({
-        message:"Unauthorized"
-    })
-   }
+    return res.status(401);
+    }
+   
    return res.json({
         id:userFoundIII._id,
         username:userFoundIII.username,
